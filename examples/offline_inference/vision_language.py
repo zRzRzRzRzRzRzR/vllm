@@ -235,8 +235,8 @@ def run_glm4v(questions: list[str], modality: str) -> ModelRequestData:
         stop_token_ids=stop_token_ids,
     )
 
-# Qwen2.5-VL
-def run_qwen2_5_vl(questions: list[str], modality: str) -> ModelRequestData:
+# GLM-4V-0414
+def run_glm4v_0414(questions: list[str], modality: str) -> ModelRequestData:
 
     model_name = "THUDM/GLM-4V-9B-0414"
 
@@ -258,10 +258,9 @@ def run_qwen2_5_vl(questions: list[str], modality: str) -> ModelRequestData:
         placeholder = "<|video|>"
 
     prompts = [
-        ("<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
-         f"<|im_start|>user\n<|vision_start|>{placeholder}<|vision_end|>"
-         f"{question}<|im_end|>\n"
-         "<|im_start|>assistant\n") for question in questions
+        ("[gMASK]<sop><|system|>\nYou are a helpful assistant.<|user|>\n"
+         f"<|begin_of_image|>{placeholder}<|end_of_image|>"
+         f"{question}<|assistant|>assistant\n") for question in questions
     ]
 
     return ModelRequestData(
