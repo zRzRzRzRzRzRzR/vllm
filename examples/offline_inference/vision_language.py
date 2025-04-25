@@ -253,13 +253,13 @@ def run_glm4v_0414(questions: list[str], modality: str) -> ModelRequestData:
     )
 
     if modality == "image":
-        placeholder = "<|image|>"
+        placeholder = "<|begin_of_image|><|image|><|end_of_image|>"
     elif modality == "video":
-        placeholder = "<|video|>"
+        placeholder = "<|begin_of_video|><|video|><|end_of_video|>"
 
     prompts = [
         ("[gMASK]<sop><|system|>\nYou are a helpful assistant.<|user|>\n"
-         f"<|begin_of_image|>{placeholder}<|end_of_image|>"
+         f"{placeholder}"
          f"{question}<|assistant|>assistant\n") for question in questions
     ]
 
