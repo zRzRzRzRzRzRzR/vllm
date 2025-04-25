@@ -235,6 +235,39 @@ def run_glm4v(questions: list[str], modality: str) -> ModelRequestData:
         stop_token_ids=stop_token_ids,
     )
 
+# Qwen2.5-VL
+def run_qwen2_5_vl(questions: list[str], modality: str) -> ModelRequestData:
+
+    model_name = "THUDM/GLM-4V-9B-0414"
+
+    engine_args = EngineArgs(
+        model=model_name,
+        max_model_len=4096,
+        max_num_seqs=5,
+        mm_processor_kwargs={
+            "min_pixels": 28 * 28,
+            "max_pixels": 1280 * 28 * 28,
+            "fps": 1,
+        },
+        limit_mm_per_prompt={"image": 1},
+    )
+
+    if modality == "image":
+        placeholder = "<|image|>"
+    elif modality == "video":
+        placeholder = "<|video|>"
+
+    prompts = [
+        ("<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
+         f"<|im_start|>user\n<|vision_start|>{placeholder}<|vision_end|>"
+         f"{question}<|im_end|>\n"
+         "<|im_start|>assistant\n") for question in questions
+    ]
+
+    return ModelRequestData(
+        engine_args=engine_args,
+        prompts=prompts,
+    )
 
 # H2OVL-Mississippi
 def run_h2ovl(questions: list[str], modality: str) -> ModelRequestData:
