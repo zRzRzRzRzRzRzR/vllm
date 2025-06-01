@@ -97,7 +97,7 @@ class RotaryEmbedding(CustomOp):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         dtype: torch.dtype,
     ) -> None:
@@ -114,7 +114,7 @@ class RotaryEmbedding(CustomOp):
         self.cos_sin_cache: torch.Tensor
         self.register_buffer("cos_sin_cache", cache, persistent=False)
 
-    def _compute_inv_freq(self, base: Union[int, float]) -> torch.Tensor:
+    def _compute_inv_freq(self, base: float) -> torch.Tensor:
         """Compute the inverse frequency."""
         # NOTE(woosuk): To exactly match the HF implementation, we need to
         # use CPU to compute the cache and then move it to GPU. However, we
@@ -405,7 +405,7 @@ class LinearScalingRotaryEmbedding(RotaryEmbedding):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         scaling_factors: Union[list[float], float],
         dtype: torch.dtype,
@@ -465,7 +465,7 @@ class NTKScalingRotaryEmbedding(RotaryEmbedding):
                  head_size: int,
                  rotary_dim: int,
                  max_position_embeddings: int,
-                 base: int,
+                 base: float,
                  is_neox_style: bool,
                  scaling_factor: float,
                  dtype: torch.dtype,
@@ -475,7 +475,7 @@ class NTKScalingRotaryEmbedding(RotaryEmbedding):
         super().__init__(head_size, rotary_dim, max_position_embeddings, base,
                          is_neox_style, dtype)
 
-    def _compute_inv_freq(self, base: Union[int, float]) -> torch.Tensor:
+    def _compute_inv_freq(self, base: float) -> torch.Tensor:
         base = self.base * (self.scaling_factor if self.mixed_b is None else 1)
         inv_freq = super()._compute_inv_freq(base)
 
@@ -502,7 +502,7 @@ class DynamicNTKScalingRotaryEmbedding(RotaryEmbedding):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         scaling_factor: float,
         dtype: torch.dtype,
@@ -583,7 +583,7 @@ class YaRNScalingRotaryEmbedding(RotaryEmbedding):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         scaling_factor: float,
         dtype: torch.dtype,
@@ -645,7 +645,7 @@ class Phi3LongRoPEScaledRotaryEmbedding(nn.Module):
         rotary_dim: int,
         max_position_embeddings: int,
         original_max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         dtype: torch.dtype,
         short_factor: list[float],
@@ -770,7 +770,7 @@ class DeepseekScalingRotaryEmbedding(RotaryEmbedding):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         scaling_factor: float,
         dtype: torch.dtype,
@@ -878,7 +878,7 @@ class Llama3RotaryEmbedding(RotaryEmbedding):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         dtype: torch.dtype,
         scaling_factor: float,
@@ -893,7 +893,7 @@ class Llama3RotaryEmbedding(RotaryEmbedding):
         super().__init__(head_size, rotary_dim, max_position_embeddings, base,
                          is_neox_style, dtype)
 
-    def _compute_inv_freq(self, base: Union[int, float]) -> torch.Tensor:
+    def _compute_inv_freq(self, base: float) -> torch.Tensor:
         inv_freqs = super()._compute_inv_freq(base)
         low_freq_wavelen = self.orig_max_position / self.low_freq_factor
         high_freq_wavelen = self.orig_max_position / self.high_freq_factor
@@ -924,14 +924,14 @@ class Llama4VisionRotaryEmbedding(RotaryEmbedding):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         dtype: torch.dtype,
     ):
         super().__init__(head_size, rotary_dim, max_position_embeddings, base,
                          is_neox_style, dtype)
 
-    def _compute_inv_freq(self, base: Union[int, float]) -> torch.Tensor:
+    def _compute_inv_freq(self, base: float) -> torch.Tensor:
         inv_freqs = super()._compute_inv_freq(base)
         inv_freqs = inv_freqs[:(self.rotary_dim // 2)]
         return inv_freqs
@@ -990,7 +990,7 @@ class MRotaryEmbedding(RotaryEmbedding):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         dtype: torch.dtype,
         mrope_section: Optional[list[int]] = None,
@@ -1659,7 +1659,7 @@ class DualChunkRotaryEmbedding(CustomOp):
         head_size: int,
         rotary_dim: int,
         max_position_embeddings: int,
-        base: int,
+        base: float,
         is_neox_style: bool,
         dtype: torch.dtype,
         chunk_size: int,
@@ -1688,7 +1688,7 @@ class DualChunkRotaryEmbedding(CustomOp):
                              q_inter_cache,
                              persistent=False)
 
-    def _compute_inv_freq(self, base: Union[int, float]) -> torch.Tensor:
+    def _compute_inv_freq(self, base: float) -> torch.Tensor:
         """Compute the inverse frequency."""
         # NOTE(woosuk): The HF implementation uses `torch.arange(...).float()`.
         # However, we use `torch.arange(..., dtype=torch.float)` instead to
@@ -1835,7 +1835,7 @@ def get_rope(
     head_size: int,
     rotary_dim: int,
     max_position: int,
-    base: int,
+    base: float,
     is_neox_style: bool = True,
     rope_scaling: Optional[dict[str, Any]] = None,
     dtype: Optional[torch.dtype] = None,
