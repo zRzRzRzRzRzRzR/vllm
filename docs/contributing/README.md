@@ -57,7 +57,7 @@ mkdocs --version
 Example output:
 
 ```console
-mkdocs, version 1.6.1 from /opt/miniconda3/envs/mkdoc/lib/python3.9/site-packages/mkdocs (Python 3.9)
+mkdocs, version 1.6.1 from /opt/miniconda3/envs/mkdoc/lib/python3.10/site-packages/mkdocs (Python 3.10)
 ```
 
 #### Clone the `vLLM` repository
@@ -108,6 +108,9 @@ pre-commit run mypy-3.9 --hook-stage manual --all-files
 
 # Unit tests
 pytest tests/
+
+# Run tests for a single test file with detailed output
+pytest -s -v tests/test_logger.py
 ```
 
 !!! tip
