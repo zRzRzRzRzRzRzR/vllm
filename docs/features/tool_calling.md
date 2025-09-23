@@ -314,8 +314,10 @@ Flags:
 
 Supported models:
 
-* `ZhipuAI/GLM-4.5`
-* `ZhipuAI/GLM-4.5-Air`
+* `zai-org/GLM-4.5`
+* `zai-org/GLM-4.5-Air`
+* `zai-org/GLM-4.6`
+* `zai-org/GLM-4.6-Air`
 
 Flags: `--tool-call-parser glm45`
 
